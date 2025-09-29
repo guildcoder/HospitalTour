@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <title>UMC Campus Map</title>
 
   <!-- Leaflet CSS -->
@@ -20,9 +20,16 @@
 
   <style>
     html, body, #map {
-      height: 100%;
+      height: 100vh;
+      width: 100vw;
       margin: 0;
       padding: 0;
+      overflow: hidden;
+    }
+    .label-text {
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px black;
     }
   </style>
 </head>
@@ -40,13 +47,31 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Overlay image (replace with generated campus_overlay.jpg)
-    var imageUrl = 'campus_overlay.jpg';
-    var imageBounds = [
-      [33.58839, -101.8899],   // Southwest corner (9th St)
-      [33.589724, -101.888278] // Northeast corner (Indiana Ave)
+    // Building data with approximate coordinates and colors
+    var buildings = [
+      {name: "Medical Office Plaza II", lat: 33.58895, lng: -101.8894, color: "cyan"},
+      {name: "Medical Office Plaza I", lat: 33.5887, lng: -101.8892, color: "orange"},
+      {name: "East Tower", lat: 33.5894, lng: -101.8883, color: "green"},
+      {name: "Main Tower", lat: 33.5895, lng: -101.8884, color: "navy"},
+      {name: "Cancer Center", lat: 33.58945, lng: -101.88835, color: "lime"},
+      {name: "TTU Health Science Library", lat: 33.5891, lng: -101.8888, color: "yellow"},
+      {name: "TTU Health Science Center and Cafeteria", lat: 33.5889, lng: -101.88885, color: "orange"},
+      {name: "Laboratory and Medical Pavilion", lat: 33.5890, lng: -101.88875, color: "pink"},
+      {name: "TTU Medical Pavilion", lat: 33.58905, lng: -101.88878, color: "grey"}
     ];
-    L.imageOverlay(imageUrl, imageBounds, {opacity: 0.95}).addTo(map);
+
+    buildings.forEach(function(b) {
+      var marker = L.circleMarker([b.lat, b.lng], {
+        radius: 12,
+        fillColor: b.color,
+        color: "#fff",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.9
+      }).addTo(map);
+      
+      marker.bindTooltip(`<span class="label-text">${b.name}</span>`, {permanent: true, direction: "top", offset: [0, -10]});
+    });
 
     // Live GPS dot
     map.locate({setView: true, maxZoom: 18, watch: true});
