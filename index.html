@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>UMC Campus Map</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- App Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#004080" />
+
+  <!-- iOS PWA support -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="UMC Map" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Center map on UMC Campus
+    var map = L.map('map').setView([33.5891, -101.8889], 17);
+
+    // Base map
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Overlay image (replace with generated campus_overlay.jpg)
+    var imageUrl = 'campus_overlay.jpg';
+    var imageBounds = [
+      [33.58839, -101.8899],   // Southwest corner (9th St)
+      [33.589724, -101.888278] // Northeast corner (Indiana Ave)
+    ];
+    L.imageOverlay(imageUrl, imageBounds, {opacity: 0.95}).addTo(map);
+
+    // Live GPS dot
+    map.locate({setView: true, maxZoom: 18, watch: true});
+    var userMarker = null;
+
+    map.on('locationfound', function(e) {
+      if (userMarker) {
+        userMarker.setLatLng(e.latlng);
+      } else {
+        userMarker = L.circleMarker(e.latlng, {
+          radius: 8,
+          fillColor: "#007bff",
+          color: "#fff",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.9
+        }).addTo(map);
+      }
+    });
+
+    map.on('locationerror', function() {
+      alert("GPS unavailable. Please allow location access.");
+    });
+  </script>
+</body>
+</html>
